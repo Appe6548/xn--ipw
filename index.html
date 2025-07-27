@@ -39,6 +39,7 @@
             align-items: center;
             min-height: 120px;
             width: 100%;
+            padding: 0 20px;
         }
 
         .text-container {
@@ -52,6 +53,7 @@
                 0 0 20px rgba(255, 255, 255, 0.7),
                 0 0 30px rgba(255, 255, 255, 0.5),
                 0 0 40px rgba(255, 255, 255, 0.3);
+            white-space: nowrap;
         }
 
         @keyframes glowPulse {
@@ -194,8 +196,8 @@
 
         .cards-container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(3, 1fr);
+            gap: clamp(10px, 2vw, 20px);
             width: 100%;
             max-width: 800px;
             margin: 0 auto;
@@ -205,12 +207,18 @@
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 12px;
-            padding: 30px;
+            padding: clamp(15px, 3vw, 30px);
             text-decoration: none;
             color: #fff;
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
+            min-height: 80px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
         }
 
         .card::before {
@@ -237,15 +245,16 @@
         }
 
         .card-title {
-            font-size: clamp(18px, 3vw, 24px);
+            font-size: clamp(14px, 3vw, 24px);
             font-weight: bold;
-            margin-bottom: 10px;
+            margin-bottom: clamp(5px, 1vw, 10px);
         }
 
         .card-url {
-            font-size: clamp(12px, 2vw, 14px);
+            font-size: clamp(10px, 2vw, 14px);
             color: rgba(255, 255, 255, 0.6);
             font-family: monospace;
+            word-break: break-all;
         }
 
         @media (max-width: 600px) {
@@ -253,8 +262,41 @@
                 gap: 50px;
             }
             
+            .text-container {
+                font-size: clamp(30px, 8vw, 60px);
+            }
+            
+            .cursor {
+                width: clamp(30px, 8vw, 60px);
+                height: clamp(30px, 8vw, 60px);
+            }
+            
+            .website-section {
+                width: 100%;
+                padding: 0 10px;
+            }
+            
             .cards-container {
-                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+            
+            .card {
+                border-radius: 8px;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .card-title {
+                font-size: 12px;
+            }
+            
+            .card-url {
+                font-size: 9px;
+            }
+            
+            .card {
+                padding: 12px 8px;
+                min-height: 60px;
             }
         }
     </style>
@@ -300,7 +342,7 @@
             { text: "You got issues?", rtl: false },
             { text: "T'as un problème?", rtl: false },
             { text: "¿Estás loco o qué?", rtl: false },
-            { text: "Ты что, с приветом?", rtl: false },
+            { text: "Ты с приветом?", rtl: false },
             { text: "إنت مالك؟", rtl: true }
         ];
         
