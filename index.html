@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>毛</title>
     <style>
+        @property --border-angle {
+            syntax: '<angle>';
+            initial-value: 0deg;
+            inherits: false;
+        }
+
         * {
             box-sizing: border-box;
             margin: 0;
@@ -23,6 +29,28 @@
             padding: 20px;
         }
 
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(125deg, #0a0a2e 0%, #1a0a2e 25%, #0a1a2e 50%, #0a0a0a 100%);
+            background-size: 400% 400%;
+            animation: aurora 15s ease infinite;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        @keyframes aurora {
+            0% { background-position: 0% 50%; }
+            25% { background-position: 50% 0%; }
+            50% { background-position: 100% 50%; }
+            75% { background-position: 50% 100%; }
+            100% { background-position: 0% 50%; }
+        }
+
         .main-container {
             display: flex;
             flex-direction: column;
@@ -30,6 +58,8 @@
             gap: 80px;
             width: 100%;
             max-width: 1200px;
+            position: relative;
+            z-index: 2;
         }
 
         .text-wrapper {
@@ -57,7 +87,7 @@
         }
 
         @keyframes glowPulse {
-            0% {
+            0%, 100% {
                 text-shadow: 
                     0 0 10px rgba(255, 255, 255, 0.9),
                     0 0 20px rgba(255, 255, 255, 0.7),
@@ -71,13 +101,6 @@
                     0 0 45px rgba(255, 255, 255, 0.6),
                     0 0 60px rgba(255, 255, 255, 0.4);
             }
-            100% {
-                text-shadow: 
-                    0 0 10px rgba(255, 255, 255, 0.9),
-                    0 0 20px rgba(255, 255, 255, 0.7),
-                    0 0 30px rgba(255, 255, 255, 0.5),
-                    0 0 40px rgba(255, 255, 255, 0.3);
-            }
         }
 
         #text-content {
@@ -85,7 +108,17 @@
             position: relative;
             min-height: 1em;
             line-height: 1;
-            animation: glowPulse 3s ease-in-out infinite;
+            animation: glowPulse 3s ease-in-out infinite, textShimmer 4s ease-in-out infinite;
+            background: linear-gradient(90deg, #ffffff, #a0c4ff, #ffffff, #c4b5fd, #ffffff);
+            background-size: 200% 100%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        @keyframes textShimmer {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
         }
 
         /* 粒子容器 */
@@ -96,6 +129,7 @@
             top: 0;
             left: 0;
             pointer-events: none;
+            z-index: 0;
         }
 
         .particle {
@@ -103,6 +137,31 @@
             background: #fff;
             border-radius: 50%;
             pointer-events: none;
+        }
+
+        .ambient-particle {
+            position: absolute;
+            background: #fff;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: ambientDrift linear infinite;
+            box-shadow: 0 0 6px rgba(255, 255, 255, 0.3);
+        }
+
+        @keyframes ambientDrift {
+            0%, 100% { transform: translate(0, 0); }
+            25% { transform: translate(30px, -40px); }
+            50% { transform: translate(-20px, -80px); }
+            75% { transform: translate(25px, -30px); }
+        }
+
+        #mouse-spotlight {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 1;
+            opacity: 0;
+            transition: opacity 0.3s ease;
         }
 
         .cursor {
@@ -127,27 +186,15 @@
         }
 
         @keyframes blink {
-            0%, 50% {
-                opacity: 1;
-            }
-            51%, 100% {
-                opacity: 0;
-            }
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
         }
 
         @keyframes float {
-            0%, 100% {
-                transform: translateY(0px) translateX(0px);
-            }
-            25% {
-                transform: translateY(-8px) translateX(4px);
-            }
-            50% {
-                transform: translateY(3px) translateX(-3px);
-            }
-            75% {
-                transform: translateY(-5px) translateX(-2px);
-            }
+            0%, 100% { transform: translateY(0px) translateX(0px); }
+            25% { transform: translateY(-8px) translateX(4px); }
+            50% { transform: translateY(3px) translateX(-3px); }
+            75% { transform: translateY(-5px) translateX(-2px); }
         }
 
         @keyframes cursorGlow {
@@ -160,18 +207,9 @@
         }
 
         @keyframes flashOnce {
-            0% {
-                opacity: 1;
-                transform: translateY(-50%) scale(1);
-            }
-            50% {
-                opacity: 0.3;
-                transform: translateY(-50%) scale(1.3);
-            }
-            100% {
-                opacity: 1;
-                transform: translateY(-50%) scale(1);
-            }
+            0% { opacity: 1; transform: translateY(-50%) scale(1); }
+            50% { opacity: 0.3; transform: translateY(-50%) scale(1.3); }
+            100% { opacity: 1; transform: translateY(-50%) scale(1); }
         }
 
         /* 网站卡片部分 */
@@ -179,7 +217,8 @@
             text-align: center;
             opacity: 0;
             transform: translateY(30px);
-            transition: all 0.8s ease-out;
+            transition: opacity 0.4s ease-out, transform 0.6s ease-out;
+            width: 100%;
         }
 
         .website-section.show {
@@ -192,6 +231,36 @@
             color: rgba(255, 255, 255, 0.8);
             margin-bottom: 30px;
             text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+            position: relative;
+            display: inline-block;
+        }
+
+        .section-title::before,
+        .section-title::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            height: 1px;
+            width: 60px;
+            transform: scaleX(0);
+            transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.3s;
+        }
+
+        .section-title::before {
+            right: calc(100% + 15px);
+            transform-origin: right center;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4));
+        }
+
+        .section-title::after {
+            left: calc(100% + 15px);
+            transform-origin: left center;
+            background: linear-gradient(270deg, transparent, rgba(255, 255, 255, 0.4));
+        }
+
+        .website-section.show .section-title::before,
+        .website-section.show .section-title::after {
+            transform: scaleX(1);
         }
 
         .cards-container {
@@ -204,13 +273,17 @@
         }
 
         .card {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            --border-angle: 0deg;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid transparent;
             border-radius: 12px;
             padding: clamp(15px, 3vw, 30px);
             text-decoration: none;
             color: #fff;
-            transition: all 0.3s ease;
+            transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+                        transform 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+                        box-shadow 0.4s ease,
+                        background-color 0.4s ease;
             position: relative;
             overflow: hidden;
             min-height: 80px;
@@ -219,6 +292,26 @@
             justify-content: center;
             align-items: center;
             text-align: center;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            background-image:
+                linear-gradient(rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.01)),
+                conic-gradient(from var(--border-angle), transparent 60%, rgba(255, 255, 255, 0.15), rgba(120, 160, 255, 0.12), transparent 100%);
+            background-origin: border-box;
+            background-clip: padding-box, border-box;
+            animation: rotateBorder 6s linear infinite;
+            opacity: 0;
+            transform: translateY(20px) scale(0.95);
+            will-change: transform;
+        }
+
+        .card.revealed {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        @keyframes rotateBorder {
+            to { --border-angle: 360deg; }
         }
 
         .card::before {
@@ -228,9 +321,9 @@
             left: -50%;
             width: 200%;
             height: 200%;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.08) 0%, transparent 60%);
             opacity: 0;
-            transition: opacity 0.3s ease;
+            transition: opacity 0.4s ease;
         }
 
         .card:hover::before {
@@ -238,10 +331,11 @@
         }
 
         .card:hover {
-            transform: translateY(-5px);
-            background: rgba(255, 255, 255, 0.1);
-            border-color: rgba(255, 255, 255, 0.3);
-            box-shadow: 0 10px 30px rgba(255, 255, 255, 0.1);
+            background-color: rgba(255, 255, 255, 0.08);
+            box-shadow:
+                0 10px 40px rgba(100, 150, 255, 0.12),
+                0 0 20px rgba(255, 255, 255, 0.05),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
         }
 
         .card-title {
@@ -255,6 +349,23 @@
             color: rgba(255, 255, 255, 0.6);
             font-family: monospace;
             word-break: break-all;
+            transition: color 0.3s ease;
+        }
+
+        .card:hover .card-url {
+            color: rgba(160, 196, 255, 0.8);
+        }
+
+        #noise-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 9999;
+            pointer-events: none;
+            opacity: 0.02;
+            mix-blend-mode: overlay;
         }
 
         @media (max-width: 600px) {
@@ -283,6 +394,11 @@
             .card {
                 border-radius: 8px;
             }
+
+            .section-title::before,
+            .section-title::after {
+                width: 30px;
+            }
         }
 
         @media (max-width: 400px) {
@@ -299,9 +415,40 @@
                 min-height: 60px;
             }
         }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+                scroll-behavior: auto !important;
+            }
+
+            .card {
+                opacity: 1;
+                transform: none;
+            }
+
+            .website-section {
+                opacity: 1;
+                transform: none;
+            }
+
+            .section-title::before,
+            .section-title::after {
+                transform: scaleX(1);
+            }
+        }
     </style>
 </head>
 <body>
+    <div id="mouse-spotlight"></div>
+    <svg id="noise-overlay" width="100%" height="100%">
+        <filter id="noise-filter">
+            <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/>
+        </filter>
+        <rect width="100%" height="100%" filter="url(#noise-filter)"/>
+    </svg>
     <div id="particle-container"></div>
     <div class="main-container">
         <div class="text-wrapper">
@@ -335,6 +482,7 @@
         const cursor = document.getElementById('cursor');
         const particleContainer = document.getElementById('particle-container');
         const websiteSection = document.getElementById('website-section');
+        const mouseSpotlight = document.getElementById('mouse-spotlight');
         
         // 联合国6大官方语言的"你有毛啊？"（毛=毛病，开玩笑的话）
         const languages = [
@@ -348,38 +496,95 @@
         
         let currentLanguageIndex = 0;
         
-        // 调整光标大小以匹配文字
         function adjustCursorSize() {
             const fontSize = window.getComputedStyle(textContent).fontSize;
             cursor.style.width = fontSize;
             cursor.style.height = fontSize;
         }
+
+        function createAmbientParticles() {
+            const count = 35;
+            for (let i = 0; i < count; i++) {
+                const p = document.createElement('div');
+                p.className = 'ambient-particle';
+                const size = Math.random() * 2 + 0.5;
+                p.style.width = size + 'px';
+                p.style.height = size + 'px';
+                p.style.left = Math.random() * 100 + '%';
+                p.style.top = Math.random() * 100 + '%';
+                p.style.animationDuration = (20 + Math.random() * 25) + 's';
+                p.style.animationDelay = -(Math.random() * 20) + 's';
+                p.style.opacity = (0.08 + Math.random() * 0.2).toString();
+                particleContainer.appendChild(p);
+            }
+        }
+
+        function initMouseSpotlight() {
+            let rafId = null;
+            document.addEventListener('mousemove', (e) => {
+                if (rafId) return;
+                rafId = requestAnimationFrame(() => {
+                    mouseSpotlight.style.background =
+                        `radial-gradient(600px circle at ${e.clientX}px ${e.clientY}px, rgba(255,255,255,0.04), transparent 40%)`;
+                    mouseSpotlight.style.opacity = '1';
+                    rafId = null;
+                });
+            });
+            document.addEventListener('mouseleave', () => {
+                mouseSpotlight.style.opacity = '0';
+            });
+        }
+
+        function initCardTilt() {
+            document.querySelectorAll('.card').forEach(card => {
+                card.addEventListener('mouseenter', () => {
+                    card.style.transition = 'box-shadow 0.4s ease, background-color 0.4s ease';
+                });
+                card.addEventListener('mousemove', (e) => {
+                    const rect = card.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    const centerX = rect.width / 2;
+                    const centerY = rect.height / 2;
+                    const rotateX = ((y - centerY) / centerY) * -8;
+                    const rotateY = ((x - centerX) / centerX) * 8;
+                    card.style.transform = `perspective(600px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-5px) scale(1.02)`;
+                });
+                card.addEventListener('mouseleave', () => {
+                    card.style.transition = 'transform 0.5s ease-out, box-shadow 0.4s ease, background-color 0.4s ease';
+                    card.style.transform = '';
+                });
+            });
+        }
+
+        function revealCards() {
+            const cards = document.querySelectorAll('.card');
+            cards.forEach((card, i) => {
+                setTimeout(() => {
+                    card.classList.add('revealed');
+                }, 150 + i * 150);
+            });
+        }
         
-        // 创建粒子汇聚成光标的效果
         function createCursorFormation() {
             const particleCount = 150;
             const particles = [];
             
-            // 获取文字容器的位置，计算光标应该在的位置
             const textContainer = document.querySelector('.text-container');
             const containerRect = textContainer.getBoundingClientRect();
             const cursorSize = parseInt(window.getComputedStyle(cursor).width);
             
-            // 光标的实际位置（文字容器左侧）
             const cursorX = containerRect.left + cursorSize / 2;
             const cursorY = containerRect.top + containerRect.height / 2;
             
-            // 创建粒子
             for (let i = 0; i < particleCount; i++) {
                 const particle = document.createElement('div');
                 particle.className = 'particle';
                 
-                // 随机粒子大小
                 const size = Math.random() * 3 + 1;
                 particle.style.width = size + 'px';
                 particle.style.height = size + 'px';
                 
-                // 随机初始位置
                 const startX = Math.random() * window.innerWidth;
                 const startY = Math.random() * window.innerHeight;
                 
@@ -387,29 +592,26 @@
                 particle.style.top = startY + 'px';
                 particle.style.opacity = '0';
                 
-                // 光晕效果
                 const brightness = 0.5 + Math.random() * 0.5;
                 particle.style.boxShadow = `0 0 ${size * 2}px rgba(255, 255, 255, ${brightness})`;
                 
                 particleContainer.appendChild(particle);
                 
-                // 使用极坐标创建圆形分布
                 const angle = Math.random() * Math.PI * 2;
                 const radius = Math.sqrt(Math.random()) * (cursorSize * 0.4);
                 
                 particles.push({
                     element: particle,
-                    startX: startX,
-                    startY: startY,
+                    startX,
+                    startY,
                     targetX: cursorX + Math.cos(angle) * radius,
                     targetY: cursorY + Math.sin(angle) * radius,
-                    size: size,
+                    size,
                     floatDelay: Math.random() * 800,
                     convergeDelay: Math.random() * 300
                 });
             }
             
-            // 第一阶段：粒子淡入并漂浮
             particles.forEach((p) => {
                 setTimeout(() => {
                     p.element.style.transition = 'opacity 0.3s ease-in';
@@ -418,9 +620,8 @@
                 }, p.floatDelay);
             });
             
-            // 第二阶段：粒子汇聚
             setTimeout(() => {
-                particles.forEach((p, index) => {
+                particles.forEach((p) => {
                     setTimeout(() => {
                         p.element.style.transition = 'all 1.5s cubic-bezier(0.4, 0, 0.2, 1)';
                         p.element.style.animation = 'none';
@@ -431,12 +632,9 @@
                     }, p.convergeDelay);
                 });
                 
-                // 粒子汇聚完成后，立即显示光标
                 setTimeout(() => {
-                    // 显示光标
                     cursor.style.opacity = '1';
                     
-                    // 同时让粒子消失
                     particles.forEach((p) => {
                         p.element.style.transition = 'all 0.3s ease-out';
                         p.element.style.opacity = '0';
@@ -445,17 +643,15 @@
                     
                     setTimeout(() => {
                         particleContainer.innerHTML = '';
+                        createAmbientParticles();
                     }, 300);
                     
-                    // 光标闪烁一次
                     cursor.style.animation = 'flashOnce 0.3s ease-out';
                     
                     setTimeout(() => {
-                        // 闪烁完成后开始正常闪烁
                         cursor.style.animation = '';
                         cursor.classList.add('blinking');
                         
-                        // 圆球光标显示1秒后开始打字
                         setTimeout(() => {
                             typeFirstMao();
                         }, 700);
@@ -464,27 +660,24 @@
             }, 1000);
         }
         
-        // 打出"毛"字
         function typeFirstMao() {
             cursor.classList.remove('blinking');
             textContent.textContent = '毛';
             updateCursorPosition();
             cursor.classList.add('blinking');
             
-            // 显示网站卡片
             setTimeout(() => {
                 websiteSection.classList.add('show');
+                revealCards();
             }, 1000);
         }
         
-        // 更新光标位置
         function updateCursorPosition() {
             const textWidth = textContent.offsetWidth;
             const cursorSize = parseInt(window.getComputedStyle(cursor).width);
             cursor.style.left = textWidth + cursorSize * 0.25 + 'px';
         }
         
-        // 逐字符删除
         function deleteTextOneByOne(callback) {
             cursor.classList.remove('blinking');
             const text = textContent.textContent;
@@ -496,20 +689,16 @@
                     textContent.textContent = text.substring(0, charCount - deletedCount - 1);
                     updateCursorPosition();
                     deletedCount++;
-                    
                     setTimeout(deleteChar, 100);
                 } else {
                     cursor.classList.add('blinking');
-                    if (callback) {
-                        setTimeout(callback, 300);
-                    }
+                    if (callback) setTimeout(callback, 300);
                 }
             }
             
             deleteChar();
         }
         
-        // 打字机效果
         function typeWriter(text) {
             cursor.classList.remove('blinking');
             let index = 0;
@@ -519,7 +708,6 @@
                     textContent.textContent += text.charAt(index);
                     updateCursorPosition();
                     index++;
-                    
                     setTimeout(type, 100);
                 } else {
                     cursor.classList.add('blinking');
@@ -529,12 +717,9 @@
             type();
         }
         
-        // 循环显示不同语言
         function showNextLanguage() {
             const lang = languages[currentLanguageIndex];
-            
             textContent.style.direction = lang.rtl ? 'rtl' : 'ltr';
-            
             typeWriter(lang.text);
             
             const typingTime = lang.text.length * 100;
@@ -548,15 +733,12 @@
             }, totalWaitTime);
         }
         
-        // 启动动画序列
         window.addEventListener('load', () => {
             adjustCursorSize();
+            initMouseSpotlight();
+            initCardTilt();
             
-            // 设置光标初始位置在文字容器的最左侧
-            const textContainer = document.querySelector('.text-container');
-            const containerRect = textContainer.getBoundingClientRect();
-            const relativeLeft = 0; // 相对于text-container的位置
-            cursor.style.left = relativeLeft + 'px';
+            cursor.style.left = '0px';
             
             createCursorFormation();
             
@@ -566,10 +748,9 @@
                         setTimeout(() => showNextLanguage(), 300);
                     });
                 }, 1000);
-            }, 4800); // 粒子汇聚2.8秒 + 圆球显示1秒 + "毛"字显示1秒
+            }, 4800);
         });
         
-        // 响应式调整
         window.addEventListener('resize', () => {
             adjustCursorSize();
             updateCursorPosition();
